@@ -12,7 +12,7 @@ import pandas as pd
 
 from aeco import config
 from aeco.parse import fx as fxmod
-from aeco.parse import gasalberta, henryhub, ngtldash
+from aeco.parse import dobenergy, gasalberta, henryhub, ngtldash
 
 GJ_PER_MMBTU = 1.055056
 BLOCKS = {"A": ("2020-06-24", "2022-08-30"), "B": ("2025-01-01", None)}
@@ -61,8 +61,29 @@ def _aeco_from_wayback() -> pd.Series:
     return all_["daily_cad_gj"]
 
 
+def _aeco_from_dobenergy() -> pd.Series:
+    files = sorted((config.RAW / "dobenergy").rglob("prices.html.gz"))
+    if not files:
+        return pd.Series(dtype=float)
+    return dobenergy.parse(gzip.decompress(files[-1].read_bytes()))
+
+
+def _aeco_all() -> pd.Series:
+    """Block A from Wayback captures, block B from dobenergy.
+
+    The two blocks are disjoint in time, so concatenation cannot splice across
+    the 28-month hole. Overlaps (none expected) resolve to the Wayback value.
+    """
+    a, b = _aeco_from_wayback(), _aeco_from_dobenergy()
+    if a.empty:
+        return b
+    if b.empty:
+        return a
+    return pd.concat([a, b[~b.index.isin(a.index)]]).sort_index()
+
+
 def build() -> pd.DataFrame:
-    df = assemble(_aeco_from_wayback(), henryhub.load(), fxmod.load())
+    df = assemble(_aeco_all(), henryhub.load(), fxmod.load())
     latest = sorted((config.RAW / "ngtldash").rglob("ngtldash.csv.gz"))
     if latest:
         nd = ngtldash.parse(gzip.decompress(latest[-1].read_bytes()))
