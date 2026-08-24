@@ -71,5 +71,12 @@ def parse(raw: bytes, *, strict: bool = False) -> pd.DataFrame:
 
 
 def restricted(df: pd.DataFrame) -> pd.DataFrame:
+    """True/False per gate, pd.NA where the dashboard has no row that day.
+
+    A plain bool column cannot express "unknown", and NaN < 100 evaluates to
+    False - silently recording every uncovered day as observed-unrestricted.
+    """
     it = df[[c for c in df.columns if c.endswith("_it")]]
-    return (it < 100).rename(columns=lambda c: c[: -len("_it")])
+    return (it < 100).astype("boolean").where(it.notna()).rename(
+        columns=lambda c: c[: -len("_it")]
+    )

@@ -98,7 +98,7 @@ def build() -> pd.DataFrame:
     if latest:
         nd = ngtldash.parse(gzip.decompress(latest[-1].read_bytes()))
         df = df.join(nd[["usjr_it"]], how="left")
-        df["restricted"] = df["usjr_it"] < 100
+        df["restricted"] = (df["usjr_it"] < 100).astype("boolean").where(df["usjr_it"].notna())
     out = config.DERIVED / "daily_panel.parquet"
     out.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(out)

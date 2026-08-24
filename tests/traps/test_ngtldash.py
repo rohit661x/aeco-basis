@@ -53,3 +53,15 @@ def test_strict_mode_raises_on_conflicting_duplicates():
 def test_missing_it_columns_raise():
     with pytest.raises(ValueError, match="no 'Current Gas Day IT'"):
         N.parse(b"Date,Something Else\n2026-08-21,1\n")
+
+
+def test_restricted_preserves_missingness_as_na_not_false():
+    # NaN < 100 evaluates to False in a plain bool column, silently converting
+    # "no dashboard row that day" into "observed unrestricted" - permanently
+    # destroying the distinction. Verified in the real panel: 1084 of 2096
+    # days with no ngtldash coverage were being recorded as restricted=False.
+    df = N.parse(CSV)
+    df.loc[pd.Timestamp("2026-08-22"), "usjr_it"] = pd.NA
+    r = N.restricted(df.reindex(df.index.union([pd.Timestamp("2026-08-22")])))
+    assert pd.isna(r.loc[pd.Timestamp("2026-08-22"), "usjr"])
+    assert r["usjr"].dtype.name == "boolean"
