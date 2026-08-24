@@ -263,5 +263,12 @@ Written before results are seen, per the brief's own discipline:
 ## 12. Open items
 
 - **The 28-month hole (2022-09 → 2024-12).** Worth one bounded investigation during implementation: Wayback coverage of dobenergy, and any other free daily AECO redistributor. If it closes, the sample stops being split.
-- **Index identity.** Which AB-NIT object the free daily series actually is (2A same-day vs 4A/5A day-ahead) is not established. It must be pinned down or the note states the ambiguity explicitly.
+- **Index identity — partially resolved 2026-08-23.** The two free daily series were compared over their 13-day overlap (Gas Alberta `aeco_ng_current` vs dobenergy). Once denominated consistently they agree to a mean absolute error of **0.021 USD/GJ (~2%)**, with correlation 0.935 and no exact matches. Reading: they are near-identical objects from the same AB-NIT family, differing by index definition or posting timing (plausibly 2A same-day vs 4A/5A day-ahead), not by price level.
+
+  **Decision: proceed, and state the ambiguity rather than resolve it.** Three reasons.
+  1. The efficiency object is a *change* in the basis over a 1–3 day window. An index-definition difference is a level-and-averaging difference that largely differences out; it does not bias `β₁` or `β₂` toward or away from zero.
+  2. The residual disagreement (~2%) is an order of magnitude below the daily basis variation the event study identifies off (mean |Δbasis| ≈ 0.34).
+  3. Resolving it definitively requires ICE or Platts, both paywalled. Spending the project's one paid dependency here would be poor allocation versus spending it on the forward series.
+
+  **Obligations this creates.** The note states which series is used per block and that the AB-NIT index code is unlabelled by both publishers. A robustness split re-runs the headline on each source separately where they overlap. And the blocks must never be pooled into a single coefficient without reporting the source change alongside the regime change — block A and block B use *different* publishers, so a block difference confounds source with period.
 - **Licensing.** gasalberta and dobenergy carry no redistribution grant. Fine as private research inputs; the repo ships derived results and code, not redistributed raw vendor data.

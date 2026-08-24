@@ -1,0 +1,9 @@
+{
+  "url": "https://www.tccustomerexpress.com/gdsr/GdsrNGTLMetric20260823.csv",
+  "source": "gdsr",
+  "artifact": "gdsr.csv",
+  "status": 200,
+  "bytes": 882,
+  "sha256": "e1871a0725a766db8fa1103d088f2cf261f1046f08e23405cf9fddfdd8f2ac81",
+  "fetched_utc": "2026-08-23T23:17:19Z"
+}
