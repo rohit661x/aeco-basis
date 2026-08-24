@@ -3,7 +3,7 @@
   "source": "dop_publisheddates",
   "artifact": "publisheddates.json",
   "status": 200,
-  "bytes": 34831,
-  "sha256": "9adc2d2568b68f8adec4db26ad6ff32b18992875ff80950b1cac69fb5490a2c2",
-  "fetched_utc": "2026-08-24T00:20:24Z"
+  "bytes": 34854,
+  "sha256": "87eb15c4046869b2fd05a4801e1ade77be237a573d50d948a02e6d0519003cd2",
+  "fetched_utc": "2026-08-24T23:23:54Z"
 }

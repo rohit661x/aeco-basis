@@ -3,7 +3,7 @@
   "source": "gdsr",
   "artifact": "gdsr.csv",
   "status": 200,
-  "bytes": 100,
-  "sha256": "2ab1609f4299b477bc976849dd1e5dfd3199bef7eda1b54ed6f6c26b12544964",
-  "fetched_utc": "2026-08-24T00:20:32Z"
+  "bytes": 880,
+  "sha256": "c042b042b33dc3fbabeb37c7b4f345d2f6abc866631196fc08316b54e2dcf866",
+  "fetched_utc": "2026-08-24T23:23:56Z"
 }

@@ -3,7 +3,7 @@
   "source": "dop_chart",
   "artifact": "chart.csv",
   "status": 200,
-  "bytes": 196787,
-  "sha256": "fd2e87d00e5635e7601a4ac91603124a8ef23b0ebb3f010805b6284bf6b02319",
-  "fetched_utc": "2026-08-24T00:20:32Z"
+  "bytes": 196817,
+  "sha256": "0275ab2b33a53947c1ee9d88b4514241dbf0d956b7e991bdebf757650ec5da41",
+  "fetched_utc": "2026-08-24T23:23:56Z"
 }
