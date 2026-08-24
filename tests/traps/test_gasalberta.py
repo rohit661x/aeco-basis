@@ -47,3 +47,32 @@ def test_live_json_maps_index_three_to_current():
 
 def test_empty_html_yields_empty_frame_not_a_crash():
     assert G.parse_inline_daily(b"<html/>").empty
+
+
+NEGATIVE_DAILY = b"""
+<script>google.visualization.arrayToDataTable([
+ ['Date', 'Monthly Index', 'Daily Index'],
+ ['18-Aug-22', 5.03, -0.05],
+ ['22-Aug-22', 5.03, -0.19],
+ ['23-Aug-22', 5.03, 0.31]]);</script>"""
+
+NEGATIVE_CURVE = b"""
+<script>google.visualization.arrayToDataTable([
+ ['Month', 'One Year Ago','One Month Ago','Current'],
+ ['Sep-22',2.83,2.74,-0.12],
+ ['Oct-22',2.90,2.80,0.55]]);</script>"""
+
+
+def test_negative_daily_prices_are_not_silently_dropped():
+    # AECO prints negative in constrained regimes - 19 captures / 73 rows in the
+    # real archive, including the August 2022 collapse. A numeric pattern with no
+    # optional sign drops exactly the observations this study is about.
+    df = G.parse_inline_daily(NEGATIVE_DAILY)
+    assert len(df) == 3
+    assert df["daily_cad_gj"].tolist() == [-0.05, -0.19, 0.31]
+    assert df["daily_cad_gj"].min() < 0
+
+
+def test_negative_forward_prices_are_not_silently_dropped():
+    curve = G.parse_inline_curve(NEGATIVE_CURVE, min_points=2)
+    assert curve == [("Sep-22", -0.12), ("Oct-22", 0.55)]

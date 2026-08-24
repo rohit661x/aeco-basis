@@ -5,8 +5,8 @@
 - Covering publications: 2023-08-04 to 2026-08-21
 
 ## Price panel
-- Daily basis observations: **1846**
-- Coverage by block: {'A': 494, 'B': 408, nan: 1176}
+- Daily basis observations: **1864**
+- Coverage by block: {'A': 496, 'B': 408, nan: 1192}
 - Block definitions: {'A': ('2020-06-24', '2022-08-30'), 'B': ('2025-01-01', None)}
 
 ## Event study power

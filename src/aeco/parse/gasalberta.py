@@ -14,9 +14,14 @@ import re
 
 import pandas as pd
 
-_DAILY_ROW = re.compile(r"\['(\d{1,2}-[A-Z][a-z]{2}-\d{2})'\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*\]")
+# AECO prints NEGATIVE in constrained regimes - the central phenomenon of this
+# study. A numeric pattern without an optional sign silently drops those rows.
+_NUM = r"(-?[\d.]+)"
+_DAILY_ROW = re.compile(
+    r"\['(\d{1,2}-[A-Z][a-z]{2}-\d{2})'\s*,\s*" + _NUM + r"\s*,\s*" + _NUM + r"\s*\]"
+)
 _CURVE_ROW = re.compile(
-    r"\['([A-Z][a-z]{2}-\d{2})'\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*\]"
+    r"\['([A-Z][a-z]{2}-\d{2})'\s*,\s*" + _NUM + r"\s*,\s*" + _NUM + r"\s*,\s*" + _NUM + r"\s*\]"
 )
 
 
