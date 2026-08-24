@@ -75,9 +75,26 @@ def build_events(snapshot_dir: Path | None = None) -> pd.DataFrame:
     df["published_utc"] = pd.to_datetime(df["published_utc"])
     for c in ("start", "end"):
         df[c] = pd.to_datetime(df[c])
-    df = df.sort_values("published_utc")
-    # Announcement = first appearance. Keying on outage_id alone gives the
-    # ORIGINAL announcement; add start/end/area to the key to get revisions.
-    ev = df.groupby("outage_id", as_index=False).first()
-    first_seen = df.groupby("outage_id")["published_utc"].min().rename("announced_utc")
-    return ev.merge(first_seen, on="outage_id", how="left")
+    # published_utc is uniform within a snapshot, so a stable sort keeps
+    # each snapshot's own record order rather than an arbitrary sort-algorithm
+    # tie-break.
+    df = df.sort_values("published_utc", kind="stable")
+    # One outageId can carry several concurrent (outage_id, area) records in a
+    # single snapshot - e.g. one maintenance event impacting USJR, WGAT and
+    # EGAT simultaneously. groupby("outage_id").first() collapses those to one
+    # row, and because GroupBy.first() skips NaN per column independently, it
+    # can splice fields from DIFFERENT area records into a single row. Key on
+    # the full (outage_id, area) pair and take an intact first-appearance
+    # record instead.
+    key = ["outage_id", "area"]
+    ev = df.drop_duplicates(key, keep="first")
+    first_seen = df.groupby(key)["published_utc"].min().rename("announced_utc")
+    ev = ev.merge(first_seen, on=key, how="left")
+    bad = ev["base_capability"] - ev["flow_capability"] != ev["reduction_e3m3d"]
+    bad &= ev["reduction_e3m3d"].notna()
+    if bad.any():
+        raise ValueError(
+            f"{int(bad.sum())} emitted row(s) fail base - flow == reduction; "
+            "the (outage_id, area) key is no longer unique per record"
+        )
+    return ev
