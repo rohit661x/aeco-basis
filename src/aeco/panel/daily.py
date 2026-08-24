@@ -68,10 +68,16 @@ def _aeco_from_wayback() -> pd.Series:
 
 
 def _aeco_from_dobenergy() -> pd.Series:
+    """Every captured dobenergy snapshot, not just the newest.
+
+    The embedded window is very likely rolling, so reading only the latest
+    capture silently drops days that have since scrolled off the front even
+    though earlier captures still hold them on disk.
+    """
     files = sorted((config.RAW / "dobenergy").rglob("prices.html.gz"))
     if not files:
         return pd.Series(dtype=float)
-    return dobenergy.parse(gzip.decompress(files[-1].read_bytes()))
+    return dobenergy.parse_all([gzip.decompress(f.read_bytes()) for f in files])
 
 
 def _aeco_all(fx: pd.Series) -> pd.Series:

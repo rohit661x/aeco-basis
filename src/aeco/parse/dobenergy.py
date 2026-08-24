@@ -43,3 +43,19 @@ def parse(html: bytes) -> pd.Series:
     )
     s = pd.Series([float(p[1]) for p in pairs], index=idx, name="aeco_usd_gj").sort_index()
     return s[~s.index.duplicated(keep="last")]
+
+
+def parse_all(bodies) -> pd.Series:
+    """Concatenate every capture rather than trusting only the newest.
+
+    The embedded window is very likely rolling, so a day that has scrolled
+    off the front of today's capture may still be on disk in an older one.
+    Later captures win on overlap (a revision), earlier ones keep days that
+    have since fallen out of the live window.
+    """
+    frames = [parse(b) for b in bodies]
+    frames = [f for f in frames if not f.empty]
+    if not frames:
+        return pd.Series(dtype=float, name="aeco_usd_gj")
+    s = pd.concat(frames).sort_index()
+    return s[~s.index.duplicated(keep="last")]

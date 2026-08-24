@@ -25,3 +25,20 @@ def test_epoch_ms_converts_to_the_mountain_gas_day():
 def test_missing_series_raises_rather_than_returning_empty():
     with pytest.raises(ValueError, match="AECO/NGX Spot Price"):
         DB.parse(b"<html>nothing here</html>")
+
+
+def test_parse_all_concatenates_every_capture_not_just_the_newest():
+    # The docstring itself says the embedded window is very likely rolling.
+    # Reading only the newest capture means days that have since scrolled off
+    # the front vanish from the panel even though an earlier capture still
+    # holds them on disk.
+    old_html = (
+        b'{"name": "AECO/NGX Spot Price", "data": [[1735801200000, 1.10], [1735887600000, 1.15]]}'
+    )
+    new_html = (
+        b'{"name": "AECO/NGX Spot Price", "data": [[1735887600000, 1.20], [1735974000000, 1.25]]}'
+    )
+    s = DB.parse_all([old_html, new_html])
+    assert len(s) == 3
+    assert s.iloc[0] == 1.10
+    assert s.loc[s.index[1]] == 1.20  # newer capture wins on overlap
