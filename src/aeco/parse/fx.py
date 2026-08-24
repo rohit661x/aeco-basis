@@ -11,7 +11,10 @@ import pandas as pd
 
 from aeco.fetch import fetch
 
-URL = "https://www.bankofcanada.ca/valet/observations/FXUSDCAD/csv"
+# Unpinned, this endpoint returns only a rolling ~10-year window, so the
+# cutoff silently advances every day the code runs and eats into older
+# captures. Pin a fixed start well before any harvested AECO data.
+URL = "https://www.bankofcanada.ca/valet/observations/FXUSDCAD/csv?start_date=2015-01-01"
 
 
 def load() -> pd.Series:

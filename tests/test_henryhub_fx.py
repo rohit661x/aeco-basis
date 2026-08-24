@@ -21,3 +21,9 @@ def test_fx_is_cad_per_usd_orientation(monkeypatch):
     # the orientation; an inverted series would sit near 0.7.
     monkeypatch.setattr(X, "fetch", lambda url, **k: FXCSV)
     assert X.load().between(1.0, 2.0).all()
+
+
+def test_fx_url_is_pinned_to_a_fixed_start_date():
+    # An unbounded query returns only a rolling ~10-year window, so the cutoff
+    # advances every day the code runs and silently eats into older captures.
+    assert "start_date=" in X.URL
