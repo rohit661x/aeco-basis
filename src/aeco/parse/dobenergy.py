@@ -4,6 +4,11 @@ The page embeds Highcharts series as JSON. Timestamps are epoch-ms at Mountain
 midnight, so they are converted through America/Edmonton to land on the correct
 gas day.
 
+UNITS: this series is denominated in **USD/GJ**, not CAD/GJ. Verified against
+overlapping Gas Alberta quotes (mean |error| 0.021 as USD/GJ vs 0.394 as CAD/GJ;
+mean ratio 0.7210 against 1/FX = 0.7181). Treating it as CAD and applying FX
+understates AECO by ~28% while still producing a plausible-looking gas price.
+
 Provenance caveat: this is an unlicensed redistribution attributed to
 'LSEG, One Exchange, & ICE' with no index-code label, and the window is very
 likely rolling. Treat as a private research input, not a redistributable series.
@@ -36,5 +41,5 @@ def parse(html: bytes) -> pd.Series:
         .tz_localize(None)
         .normalize()
     )
-    s = pd.Series([float(p[1]) for p in pairs], index=idx, name="aeco_cad_gj").sort_index()
+    s = pd.Series([float(p[1]) for p in pairs], index=idx, name="aeco_usd_gj").sort_index()
     return s[~s.index.duplicated(keep="last")]

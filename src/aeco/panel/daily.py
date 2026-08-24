@@ -11,6 +11,7 @@ import gzip
 import pandas as pd
 
 from aeco import config
+from aeco.panel import units
 from aeco.parse import fx as fxmod
 from aeco.parse import dobenergy, gasalberta, henryhub, ngtldash
 
@@ -29,8 +30,14 @@ def _block(ts: pd.Timestamp):
     return None
 
 
-def assemble(aeco_cad: pd.Series, hh: pd.Series, fx: pd.Series) -> pd.DataFrame:
-    df = pd.DataFrame({"aeco_cad_gj": aeco_cad}).sort_index()
+def assemble(aeco_usd_mmbtu: pd.Series, hh: pd.Series, fx: pd.Series) -> pd.DataFrame:
+    """Assemble the basis panel from AECO already normalised to USD/MMBtu.
+
+    AECO must arrive in USD/MMBtu because sources differ in denomination
+    (Gas Alberta CAD/GJ, dobenergy USD/GJ); conversion belongs at the source,
+    not here.
+    """
+    df = pd.DataFrame({"aeco_usd_mmbtu": aeco_usd_mmbtu}).sort_index()
     # as-of joins: never import a future-dated value
     df["hh_usd_mmbtu"] = (
         hh.reindex(df.index, method="ffill") if len(hh) else pd.Series(pd.NA, index=df.index)
@@ -38,7 +45,6 @@ def assemble(aeco_cad: pd.Series, hh: pd.Series, fx: pd.Series) -> pd.DataFrame:
     df["fx_usdcad"] = (
         fx.reindex(df.index, method="ffill") if len(fx) else pd.Series(pd.NA, index=df.index)
     )
-    df["aeco_usd_mmbtu"] = df["aeco_cad_gj"] * GJ_PER_MMBTU / df["fx_usdcad"]
     df["basis_usd_mmbtu"] = df["aeco_usd_mmbtu"] - df["hh_usd_mmbtu"]
     df["block"] = pd.Series([_block(t) for t in df.index], index=df.index, dtype="object")
     return df
@@ -68,13 +74,16 @@ def _aeco_from_dobenergy() -> pd.Series:
     return dobenergy.parse(gzip.decompress(files[-1].read_bytes()))
 
 
-def _aeco_all() -> pd.Series:
-    """Block A from Wayback captures, block B from dobenergy.
+def _aeco_all(fx: pd.Series) -> pd.Series:
+    """Block A from Wayback captures (CAD/GJ), block B from dobenergy (USD/GJ).
 
-    The two blocks are disjoint in time, so concatenation cannot splice across
-    the 28-month hole. Overlaps (none expected) resolve to the Wayback value.
+    Each is converted to USD/MMBtu by its OWN rule before concatenation. The two
+    blocks are disjoint in time, so concatenation cannot splice across the
+    28-month hole. Overlaps (none expected) resolve to the Wayback value.
     """
-    a, b = _aeco_from_wayback(), _aeco_from_dobenergy()
+    a_raw, b_raw = _aeco_from_wayback(), _aeco_from_dobenergy()
+    a = units.cad_gj_to_usd_mmbtu(a_raw, fx) if not a_raw.empty else a_raw
+    b = units.usd_gj_to_usd_mmbtu(b_raw) if not b_raw.empty else b_raw
     if a.empty:
         return b
     if b.empty:
@@ -83,7 +92,8 @@ def _aeco_all() -> pd.Series:
 
 
 def build() -> pd.DataFrame:
-    df = assemble(_aeco_all(), henryhub.load(), fxmod.load())
+    fx = fxmod.load()
+    df = assemble(_aeco_all(fx), henryhub.load(), fx)
     latest = sorted((config.RAW / "ngtldash").rglob("ngtldash.csv.gz"))
     if latest:
         nd = ngtldash.parse(gzip.decompress(latest[-1].read_bytes()))
