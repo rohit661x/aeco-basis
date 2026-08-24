@@ -44,3 +44,14 @@ def test_harvest_skips_already_downloaded(tmp_path, monkeypatch):
     W.harvest("http://x", "ga")
     W.harvest("http://x", "ga")
     assert len(calls) == 1
+
+
+def test_snapshot_peels_every_gzip_layer_not_just_one(monkeypatch):
+    # Some archived responses come back double-gzipped. Peeling only one layer
+    # with `if` leaves compressed bytes that a text parser silently reads as
+    # mojibake and returns zero rows for - real archive: 10 of 127 captures.
+    import gzip
+    inner = b"<html>real content</html>"
+    double = gzip.compress(gzip.compress(inner))
+    monkeypatch.setattr(W, "fetch", lambda url, **k: double)
+    assert W.snapshot("http://x", "20220818023318") == inner

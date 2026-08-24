@@ -26,7 +26,10 @@ def captures(url: str, *, status: str = "200", limit: int = 3000) -> list[str]:
 
 def snapshot(url: str, ts: str) -> bytes:
     body = fetch(f"https://web.archive.org/web/{ts}id_/{url}", timeout=120, retries=4)
-    if body[:2] == b"\x1f\x8b":  # some archived responses come back undecoded
+    # Some archived responses come back double-gzipped. Peel every layer, not
+    # just one - real archive had 10/127 captures still compressed after a
+    # single decompress, which a text parser then silently read as zero rows.
+    while body[:2] == b"\x1f\x8b":
         body = gzip.decompress(body)
     return body
 
