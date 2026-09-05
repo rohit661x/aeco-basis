@@ -1,0 +1,9 @@
+{
+  "url": "https://www.dobenergy.com/data/markets/prices/",
+  "source": "dobenergy",
+  "artifact": "prices.html",
+  "status": 200,
+  "bytes": 264571,
+  "sha256": "d9ea86ed381dcb2276400fcebdaaee8cee2227acd6374d61750e0e20f7dfd409",
+  "fetched_utc": "2026-09-05T00:41:02Z"
+}

@@ -1,0 +1,9 @@
+{
+  "url": "https://www.gasalberta.com/actions/charts/default?id=aeco_ng_current",
+  "source": "gasalberta_index_current",
+  "artifact": "index.json",
+  "status": 200,
+  "bytes": 449,
+  "sha256": "7d27b16be4fa2968e6f76ae5578528122fbdb229197be4b61ef4a22bfcdb5a73",
+  "fetched_utc": "2026-09-05T00:40:58Z"
+}
