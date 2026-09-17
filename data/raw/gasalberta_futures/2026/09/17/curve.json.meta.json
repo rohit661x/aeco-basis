@@ -1,0 +1,9 @@
+{
+  "url": "https://www.gasalberta.com/actions/charts/default?id=aeco_c_futures",
+  "source": "gasalberta_futures",
+  "artifact": "curve.json",
+  "status": 200,
+  "bytes": 1214,
+  "sha256": "69fc096e12afb2bd59c6a43b4420a80833dd1ab26c8d9737892937bce512c765",
+  "fetched_utc": "2026-09-17T01:08:00Z"
+}
