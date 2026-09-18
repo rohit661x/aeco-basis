@@ -1,0 +1,9 @@
+{
+  "url": "https://www.tccustomerexpress.com/alberta/dashboard/ngtldash.csv",
+  "source": "ngtldash",
+  "artifact": "ngtldash.csv",
+  "status": 200,
+  "bytes": 385889,
+  "sha256": "a3e4a9f7069f57fac5c70a9ba02e020249a264c02eaad6bc9abbf52f54d4e1d4",
+  "fetched_utc": "2026-09-18T01:05:31Z"
+}

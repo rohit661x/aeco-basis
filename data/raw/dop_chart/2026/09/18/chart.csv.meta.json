@@ -1,0 +1,9 @@
+{
+  "url": "https://f51561ras5.execute-api.us-west-2.amazonaws.com/production/chart/csv",
+  "source": "dop_chart",
+  "artifact": "chart.csv",
+  "status": 200,
+  "bytes": 191283,
+  "sha256": "3f8d71b6ab86d661c6ec70d60a3ced06d47398c0cd9d7d50f178c81b03934ad2",
+  "fetched_utc": "2026-09-18T01:05:33Z"
+}
