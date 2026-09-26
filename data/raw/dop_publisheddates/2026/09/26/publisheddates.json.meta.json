@@ -1,0 +1,9 @@
+{
+  "url": "https://f51561ras5.execute-api.us-west-2.amazonaws.com/production/outages/publisheddates",
+  "source": "dop_publisheddates",
+  "artifact": "publisheddates.json",
+  "status": 200,
+  "bytes": 35360,
+  "sha256": "bc173965814ed8e0e62b1c1d271c2f359ffbf70e3fe478a4317044d7057c61bf",
+  "fetched_utc": "2026-09-26T01:15:55Z"
+}
